@@ -3,6 +3,7 @@ import {sassPlugin} from 'esbuild-sass-plugin';
 import postcss from 'postcss';
 import autoprefixer from 'autoprefixer';
 import "dotenv/config";
+import fs from 'fs';
 
 const port = 8000;
 const args = process.argv.slice(2);
@@ -17,7 +18,7 @@ const watchPlugin = {
     });
 
     build.onEnd((result) => {
-      if(result.errors && result.errors.length > 0) {
+      if(result.errors.length > 0) {
         console.log(`Build finished, with errors ${new Date(Date.now()).toLocaleString()}`);
         console.log(result.errors);
       } else {
@@ -59,7 +60,8 @@ let commonSettings = {
   define: {
     'API_BASE_URL': JSON.stringify(process.env.API_BASE_URL),
     'TOKEN_BEARER': JSON.stringify(process.env.TOKEN_BEARER),
-    'CURRENT_USER': JSON.stringify(process.env.CURRENT_USER)
+    'CURRENT_USER': JSON.stringify(process.env.CURRENT_USER),
+    'API_VERSION': JSON.stringify(process.env.API_VERSION)
   }
 }
 
@@ -85,20 +87,59 @@ if(watch ||  dev) {
 
   if(dev) {
     console.log("Debug Mode with" , debugSettings);
+    await debugMode.rebuild();   // ensure JS + CSS exist
+
+    injectAssets({
+      js: 'assets/index.js',
+      css: 'assets/styles/index.css'
+    });
     debugMode.serve({
       servedir: 'public',
-      port: port
+      port: port,
+      fallback: 'index.html'
     });
   }
 } else {
   productionSettings = {
     ...commonSettings,
-    // add settings for production.
+    entryNames: '[name].[hash]',
+    assetNames: '[name].[hash]',
+    metafile: true
   }
+
   console.log("Building with" , productionSettings);
-  esbuild.build(productionSettings).catch((err) => {
+
+  esbuild.build(productionSettings).then((result) => {
+    let js, css;
+    for (const [outfile, meta] of Object.entries(result.metafile.outputs)) {
+      if (meta.entryPoint?.endsWith('src/index.js')) {
+        js = outfile.replace('public/', '');
+      }
+      if (meta.entryPoint?.endsWith('src/styles/index.scss')) {
+        css = outfile.replace('public/', '');
+      }
+    }
+
+    injectAssets({ js, css });
+    console.log("Deployment build completed.");
+  }).catch((err) => {
     console.error(err);
     process.exit(1);
   });
-  console.log("Deployment build completed.");
+}
+
+function injectAssets({ js, css }) {
+  let html = fs.readFileSync('public/index.template.html', 'utf-8');
+
+  html = html.replace(
+    '<!-- CSS_PLACEHOLDER -->',
+    css ? `<link rel="stylesheet" href="/${css}">` : ''
+  );
+
+  html = html.replace(
+    '<!-- JS_PLACEHOLDER -->',
+    `<script src="/${js}" defer></script>`
+  );
+
+  fs.writeFileSync('public/index.html', html);
 }

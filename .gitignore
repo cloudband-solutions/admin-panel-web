@@ -20,3 +20,8 @@ yarn-error.log*
 public/assets/index.js
 public/assets/index.js.map
 public/assets/styles/*
+
+public/index.html
+
+public/assets/**
+public/index.html

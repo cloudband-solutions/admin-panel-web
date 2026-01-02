@@ -6,6 +6,7 @@
   "scripts": {
     "build": "node build.js",
     "start": "node build.js --watch --dev",
+    "update_version": "node scripts/update_version.js",
     "mock-server": "node mock-server.cjs"
   },
   "author": "",
