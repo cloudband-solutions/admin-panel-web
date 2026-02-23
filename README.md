@@ -38,6 +38,10 @@ npm run mock-server
 npm run start
 ```
 
+## Routing
+
+Public routes live in `src/js/App.js` and render without authentication. The default public page is `Home` at `/`, and the login screen is at `/login`. Authenticated routes render inside the sidebar layout once a session exists.
+
 ## Clone for a new project
 
 Use this repo as a starting point for your own project named `myprojectweb`.

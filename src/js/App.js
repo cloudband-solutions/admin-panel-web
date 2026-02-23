@@ -8,13 +8,23 @@ import {
 } from "react-router-dom";
 
 import Dashboard from "./Dashboard";
+import Home from "./Home";
 
 export default App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   if (!isLoggedIn()) {
     return (
-      <Login/>
+      <Routes>
+        <Route
+          path="/"
+          element={<Home/>}
+        />
+        <Route
+          path="/login"
+          element={<Login/>}
+        />
+      </Routes>
     );
   }
 
