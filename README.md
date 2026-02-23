@@ -38,6 +38,17 @@ npm run mock-server
 npm run start
 ```
 
+## Clone for a new project
+
+Use this repo as a starting point for your own project named `myprojectweb`.
+
+```bash
+git clone <REPO_URL> myprojectweb
+cd myprojectweb
+rm -rf .git
+git init
+```
+
 ## Upgrading all packages
 
 Run first `npm-check-updates`:
