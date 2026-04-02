@@ -6,6 +6,7 @@ import {
   faUserGear
 } from "@fortawesome/free-solid-svg-icons";
 import AdminContent from "./commons/AdminContent";
+import PageHeader from "./commons/PageHeader";
 
 const settingGroups = [
   {
@@ -23,17 +24,9 @@ const settingGroups = [
 export default Settings = () => {
   return (
     <div className="d-flex flex-column gap-4">
-      <div>
-        <p className="text-uppercase text-muted small fw-semibold mb-1">
-          Administration
-        </p>
-        <h1 className="h3 mb-1">
-          Settings
-        </h1>
-        <p className="text-muted mb-0">
-          Manage the configuration surfaces linked from the sidebar and service search.
-        </p>
-      </div>
+      <PageHeader
+        title="Settings"
+      />
 
       <div className="row g-3">
         {settingGroups.map((group) => {

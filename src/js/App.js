@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import Login from "./Login";
 import { isLoggedIn } from "./services/AuthService";
 import Sidebar from "./Sidebar";
 import TopNavigation from "./TopNavigation";
 import {
+  Navigate,
+  Outlet,
   Routes,
   Route
 } from "react-router-dom";
@@ -11,48 +13,79 @@ import {
 import Dashboard from "./Dashboard";
 import Home from "./Home";
 import Settings from "./Settings";
+import UsersIndex from "./users/Index";
+import UsersShow from "./users/Show";
+import UsersForm from "./users/Form";
 
-export default App = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
+const RequireAuth = () => {
   if (!isLoggedIn()) {
-    return (
-      <Routes>
-        <Route
-          path="/"
-          element={<Home/>}
-        />
-        <Route
-          path="/login"
-          element={<Login/>}
-        />
-      </Routes>
-    );
+    return <Navigate to="/login" replace />;
   }
 
+  return <Outlet />;
+};
+
+const AuthenticatedLayout = () => {
   return (
-    <React.Fragment>
-      <div className="app-container">
-        <Sidebar
-          isOpen={isSidebarOpen}
-          setIsOpen={setIsSidebarOpen}
-        />
-        <div className={`app-main-section ${isSidebarOpen ? 'open' : ''}`}>
-          <TopNavigation/>
-          <main className="container-fluid px-3 pb-3">
-            <Routes>
-              <Route
-                path="/"
-                element={<Dashboard/>}
-              />
-              <Route
-                path="/settings"
-                element={<Settings/>}
-              />
-            </Routes>
-          </main>
-        </div>
+    <div className="app-container">
+      <Sidebar />
+      <div className="app-main-section">
+        <TopNavigation />
+        <main className="app-page-shell container-fluid px-3">
+          <Outlet />
+        </main>
       </div>
-    </React.Fragment>
+    </div>
   );
-}
+};
+
+const App = () => {
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={isLoggedIn() ? <Navigate to="/dashboard" replace /> : <Home />}
+      />
+      <Route
+        path="/login"
+        element={isLoggedIn() ? <Navigate to="/dashboard" replace /> : <Login />}
+      />
+
+      <Route element={<RequireAuth />}>
+        <Route element={<AuthenticatedLayout />}>
+          <Route
+            path="/dashboard"
+            element={<Dashboard />}
+          />
+          <Route
+            path="/settings"
+            element={<Settings />}
+          />
+          <Route
+            path="/users"
+            element={<UsersIndex />}
+          />
+          <Route
+            path="/users/new"
+            element={<UsersForm />}
+          />
+          <Route
+            path="/users/:id"
+            element={<UsersShow />}
+          />
+          <Route
+            path="/users/:id/edit"
+            element={<UsersForm />}
+          />
+        </Route>
+      </Route>
+
+      <Route
+        path="*"
+        element={<Navigate to={isLoggedIn() ? "/dashboard" : "/"} replace />}
+      />
+    </Routes>
+  );
+};
+
+export default App;

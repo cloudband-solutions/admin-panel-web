@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { renderInputErrors, getInputClassName } from "./helpers/AppHelper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faLock, faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 import { 
   login,
   createSession
@@ -12,6 +13,7 @@ export default Login = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = () => {
     setIsLoading(true);
@@ -22,7 +24,7 @@ export default Login = () => {
         user: payload.data.user
       });
 
-      window.location.href = "/";
+      navigate("/dashboard");
     }).catch((payload) => {
       console.log("Something went wrong");
       console.log(payload.response);
@@ -83,7 +85,7 @@ export default Login = () => {
           <div className="mt-2"/>
           <div className="form-group p-2">
             <button
-              className="btn btn-primary w-100"
+              className="btn btn-primary w-100 d-inline-flex align-items-center justify-content-center gap-2"
               disabled={isLoading}
               onClick={handleLogin}
               onKeyDown={(event) => {
@@ -92,7 +94,8 @@ export default Login = () => {
                 }
               }}
             >
-              Login
+              <FontAwesomeIcon icon={faRightToBracket}/>
+              <span>Login</span>
             </button>
           </div>
           <hr/>

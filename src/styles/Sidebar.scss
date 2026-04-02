@@ -92,6 +92,36 @@
   transition: all 0.4s ease;
 }
 
+.sidebar .nav-links li.sidebar-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.8rem 1rem 0.45rem;
+  padding: 0;
+  background: transparent;
+}
+
+.sidebar .nav-links li.sidebar-divider:hover,
+.sidebar .nav-links li.sidebar-divider.active {
+  background: transparent;
+}
+
+.sidebar-divider-line {
+  display: block;
+  flex: 1 1 auto;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.sidebar-divider-label {
+  flex: 0 0 auto;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
 .sidebar .nav-links li:hover,
 .sidebar .nav-links li.active {
   background: $english-violet;
@@ -164,6 +194,11 @@
   opacity: 0;
   pointer-events: none;
   white-space: nowrap;
+}
+
+.sidebar.close .sidebar-divider-label,
+.sidebar.close .sidebar-divider-line {
+  opacity: 0;
 }
 
 .sidebar .nav-links li .sub-menu {

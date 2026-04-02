@@ -6,10 +6,10 @@ import {
   faStar
 } from "@fortawesome/free-solid-svg-icons";
 import {
-  destroySession,
-  getCurrentUser
+  getCurrentUser,
+  logoutAndRedirect
 } from "./services/AuthService";
-import { navigationServices } from "./navigationServices";
+import { getVisibleNavigationServices } from "./navigationServices";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const PINNED_SERVICES_KEY = "ADMIN_PANEL_PINNED_SERVICES";
@@ -79,6 +79,7 @@ export default TopNavigation = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [pinnedServiceIds, setPinnedServiceIds] = useState(readPinnedServices);
   const currentUser = getCurrentUser();
+  const navigationServices = getVisibleNavigationServices(currentUser);
   const navigate = useNavigate();
   const location = useLocation();
   const normalizedSearch = searchValue.trim().toLowerCase();
@@ -205,8 +206,7 @@ export default TopNavigation = () => {
               type="button"
               className="btn btn-danger btn-sm d-inline-flex align-items-center gap-2"
               onClick={() => {
-                destroySession();
-                window.location.href = "/";
+                logoutAndRedirect();
               }}
             >
               <FontAwesomeIcon icon={faRightFromBracket} />

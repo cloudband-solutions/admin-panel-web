@@ -294,3 +294,7 @@ Default checklist:
 - No large abstraction layer for CRUD screens unless repeated duplication clearly justifies it.
 
 Keep the code straightforward, close to the existing project style, and easy for the next agent to extend.
+
+## Interface Guidelines
+
+- Buttons shoudl have corresponding icons.

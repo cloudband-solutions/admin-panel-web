@@ -24,6 +24,11 @@ export const destroySession = () => {
   localStorage.removeItem(TOKEN_BEARER);
 }
 
+export const logoutAndRedirect = () => {
+  destroySession();
+  window.location.replace(`${window.location.pathname}${window.location.search}#/`);
+}
+
 export const isLoggedIn = () => {
   return getCurrentUser() != false;
 }
@@ -35,11 +40,21 @@ export const getToken = () => {
 export const getCurrentUser = () => {
   const token = getToken();
 
-  if (token) {
+  if (!token) {
+    return false;
+  }
+
+  try {
     const currentUser = jwtDecode(token);
 
+    if (currentUser.exp && currentUser.exp * 1000 <= Date.now()) {
+      destroySession();
+      return false;
+    }
+
     return currentUser;
-  } else {
+  } catch (error) {
+    destroySession();
     return false;
   }
 }

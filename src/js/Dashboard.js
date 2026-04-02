@@ -6,11 +6,14 @@ import {
   faCircleCheck,
   faCloud,
   faCreditCard,
+  faFileArrowDown,
+  faPlus,
   faServer,
   faTriangleExclamation,
   faUsers
 } from "@fortawesome/free-solid-svg-icons";
 import AdminContent from "./commons/AdminContent";
+import PageHeader from "./commons/PageHeader";
 
 const stats = [
   {
@@ -153,27 +156,20 @@ const getBadgeClass = (value) => {
 const Dashboard = () => {
   return (
     <div className="d-flex flex-column gap-4">
-      <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-        <div>
-          <p className="text-uppercase text-muted small fw-semibold mb-1">
-            Overview
-          </p>
-          <h1 className="h3 mb-1">
-            Operations dashboard
-          </h1>
-          <p className="text-muted mb-0">
-            Static mock for the default admin experience and feature layout.
-          </p>
-        </div>
-        <div className="d-flex gap-2">
-          <button className="btn btn-outline-secondary">
-            Export Report
+      <PageHeader
+        eyebrow="Overview"
+        title="Operations dashboard"
+        actions={[
+          <button className="btn btn-outline-secondary d-inline-flex align-items-center gap-2" key="export-report" type="button">
+            <FontAwesomeIcon icon={faFileArrowDown} />
+            <span>Export</span>
+          </button>,
+          <button className="btn btn-primary d-inline-flex align-items-center gap-2" key="create-notice" type="button">
+            <FontAwesomeIcon icon={faPlus} />
+            <span>Notice</span>
           </button>
-          <button className="btn btn-primary">
-            Create Notice
-          </button>
-        </div>
-      </div>
+        ]}
+      />
 
       <div className="row g-3">
         {stats.map((stat) => {
