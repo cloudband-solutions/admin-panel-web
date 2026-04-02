@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Login from "./Login";
 import { isLoggedIn } from "./services/AuthService";
 import Sidebar from "./Sidebar";
+import TopNavigation from "./TopNavigation";
 import {
   Routes,
   Route
@@ -9,6 +10,7 @@ import {
 
 import Dashboard from "./Dashboard";
 import Home from "./Home";
+import Settings from "./Settings";
 
 export default App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -36,11 +38,16 @@ export default App = () => {
           setIsOpen={setIsSidebarOpen}
         />
         <div className={`app-main-section ${isSidebarOpen ? 'open' : ''}`}>
-          <main className="container-fluid p-3">
+          <TopNavigation/>
+          <main className="container-fluid px-3 pb-3">
             <Routes>
               <Route
                 path="/"
                 element={<Dashboard/>}
+              />
+              <Route
+                path="/settings"
+                element={<Settings/>}
               />
             </Routes>
           </main>
