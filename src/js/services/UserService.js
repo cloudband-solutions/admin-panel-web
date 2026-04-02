@@ -31,3 +31,9 @@ export const deleteUser = (id) => {
     headers: buildHeaders()
   });
 };
+
+export const activateUser = (id) => {
+  return axios.put(`${API_BASE_URL}/users/${id}/activate`, {}, {
+    headers: buildHeaders()
+  });
+};

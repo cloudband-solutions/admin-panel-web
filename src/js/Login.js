@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { renderInputErrors, getInputClassName } from "./helpers/AppHelper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock, faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 import { 
   login,
-  createSession
+  createSessionAndRedirect
 } from "./services/AuthService";
 
 export default Login = () => {
@@ -13,18 +12,15 @@ export default Login = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleLogin = () => {
     setIsLoading(true);
 
     login({ email, password}).then((payload) => {
-      createSession({
+      createSessionAndRedirect({
         token: payload.data.token,
         user: payload.data.user
       });
-
-      navigate("/dashboard");
     }).catch((payload) => {
       console.log("Something went wrong");
       console.log(payload.response);

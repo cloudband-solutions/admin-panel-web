@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Login from "./Login";
-import { isLoggedIn } from "./services/AuthService";
+import { AUTH_STATE_CHANGE_EVENT, isLoggedIn } from "./services/AuthService";
 import Sidebar from "./Sidebar";
 import TopNavigation from "./TopNavigation";
 import {
   Navigate,
-  Outlet,
   Routes,
   Route
 } from "react-router-dom";
@@ -17,22 +16,70 @@ import UsersIndex from "./users/Index";
 import UsersShow from "./users/Show";
 import UsersForm from "./users/Form";
 
-const RequireAuth = () => {
-  if (!isLoggedIn()) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <Outlet />;
+const PublicApp = () => {
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={<Home />}
+      />
+      <Route
+        path="/login"
+        element={<Login />}
+      />
+      <Route
+        path="*"
+        element={<Navigate to="/" replace />}
+      />
+    </Routes>
+  );
 };
 
-const AuthenticatedLayout = () => {
+const AuthenticatedApp = () => {
   return (
     <div className="app-container">
       <Sidebar />
       <div className="app-main-section">
         <TopNavigation />
         <main className="app-page-shell container-fluid px-3">
-          <Outlet />
+          <Routes>
+            <Route
+              path="/"
+              element={<Navigate to="/dashboard" replace />}
+            />
+            <Route
+              path="/login"
+              element={<Navigate to="/dashboard" replace />}
+            />
+            <Route
+              path="/dashboard"
+              element={<Dashboard />}
+            />
+            <Route
+              path="/settings"
+              element={<Settings />}
+            />
+            <Route
+              path="/users"
+              element={<UsersIndex />}
+            />
+            <Route
+              path="/users/new"
+              element={<UsersForm />}
+            />
+            <Route
+              path="/users/:id"
+              element={<UsersShow />}
+            />
+            <Route
+              path="/users/:id/edit"
+              element={<UsersForm />}
+            />
+            <Route
+              path="*"
+              element={<Navigate to="/dashboard" replace />}
+            />
+          </Routes>
         </main>
       </div>
     </div>
@@ -40,52 +87,29 @@ const AuthenticatedLayout = () => {
 };
 
 const App = () => {
-  return (
-    <Routes>
-      <Route
-        path="/"
-        element={isLoggedIn() ? <Navigate to="/dashboard" replace /> : <Home />}
-      />
-      <Route
-        path="/login"
-        element={isLoggedIn() ? <Navigate to="/dashboard" replace /> : <Login />}
-      />
+  const [authenticated, setAuthenticated] = useState(isLoggedIn());
 
-      <Route element={<RequireAuth />}>
-        <Route element={<AuthenticatedLayout />}>
-          <Route
-            path="/dashboard"
-            element={<Dashboard />}
-          />
-          <Route
-            path="/settings"
-            element={<Settings />}
-          />
-          <Route
-            path="/users"
-            element={<UsersIndex />}
-          />
-          <Route
-            path="/users/new"
-            element={<UsersForm />}
-          />
-          <Route
-            path="/users/:id"
-            element={<UsersShow />}
-          />
-          <Route
-            path="/users/:id/edit"
-            element={<UsersForm />}
-          />
-        </Route>
-      </Route>
+  useEffect(() => {
+    const syncAuthenticationState = () => {
+      setAuthenticated(isLoggedIn());
+    };
 
-      <Route
-        path="*"
-        element={<Navigate to={isLoggedIn() ? "/dashboard" : "/"} replace />}
-      />
-    </Routes>
-  );
+    window.addEventListener(AUTH_STATE_CHANGE_EVENT, syncAuthenticationState);
+    window.addEventListener("storage", syncAuthenticationState);
+    window.addEventListener("hashchange", syncAuthenticationState);
+
+    return () => {
+      window.removeEventListener(AUTH_STATE_CHANGE_EVENT, syncAuthenticationState);
+      window.removeEventListener("storage", syncAuthenticationState);
+      window.removeEventListener("hashchange", syncAuthenticationState);
+    };
+  }, []);
+
+  if (authenticated) {
+    return <AuthenticatedApp />;
+  }
+
+  return <PublicApp />;
 };
 
 export default App;

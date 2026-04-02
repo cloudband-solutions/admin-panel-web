@@ -29,25 +29,21 @@ export const getCurrentDateInputString = () => {
 }
 
 export const statusToLabel = (status) => {
-  if (status == "pending") {
-    return (
-      <span className="badge text-bg-secondary">
-        {status.toUpperCase()}
-      </span>
-    );
-  } else if (status === "done") {
-    return (
-      <span className="badge text-bg-success">
-        {status.toUpperCase()}
-      </span>
-    );
-  } else if (status === "active") {
-    return (
-      <span className="badge text-bg-info">
-        {status.toUpperCase()}
-      </span>
-    );
-  }
+  const badgeClassNames = {
+    active: "text-bg-success",
+    pending: "text-bg-secondary",
+    inactive: "text-bg-warning",
+    deleted: "text-bg-danger",
+    done: "text-bg-success"
+  };
+
+  const badgeClassName = badgeClassNames[status] || "text-bg-dark";
+
+  return (
+    <span className={`badge ${badgeClassName}`}>
+      {String(status || "unknown").toUpperCase()}
+    </span>
+  );
 }
 
 export const buildHeaders = (args) => {

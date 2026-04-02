@@ -298,3 +298,4 @@ Keep the code straightforward, close to the existing project style, and easy for
 ## Interface Guidelines
 
 - Buttons shoudl have corresponding icons.
+- Use badges for statuses

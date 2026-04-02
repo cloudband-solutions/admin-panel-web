@@ -6,6 +6,7 @@ import AdminContent from "../commons/AdminContent";
 import Loader from "../commons/Loader";
 import Pagination from "../Pagination";
 import PageHeader from "../commons/PageHeader";
+import { statusToLabel } from "../helpers/AppHelper";
 import { destroySession } from "../services/AuthService";
 import { fetchUsers } from "../services/UserService";
 
@@ -107,7 +108,7 @@ const UsersIndex = () => {
                           </td>
                           <td>{user.email}</td>
                           <td className="text-capitalize">{user.role}</td>
-                          <td className="text-capitalize">{user.status}</td>
+                          <td>{statusToLabel(user.status)}</td>
                           <td className="text-end">
                             <Link className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2" to={`/users/${user.id}`}>
                               <FontAwesomeIcon icon={faEye} />

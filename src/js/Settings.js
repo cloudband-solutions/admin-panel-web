@@ -1,27 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faGears,
-  faShieldHalved,
-  faUserGear
+  faArrowRightFromBracket,
+  faKey,
+  faLock,
+  faShieldHalved
 } from "@fortawesome/free-solid-svg-icons";
 import AdminContent from "./commons/AdminContent";
 import PageHeader from "./commons/PageHeader";
+import { getInputClassName, renderInputErrors } from "./helpers/AppHelper";
+import { changePassword, destroySession } from "./services/AuthService";
 
-const settingGroups = [
-  {
-    title: "Access Control",
-    description: "Review role assignments, session policies, and privileged routes.",
-    icon: faShieldHalved
-  },
-  {
-    title: "Workspace Preferences",
-    description: "Tune console defaults, search shortcuts, and operator preferences.",
-    icon: faUserGear
-  }
-];
+const Settings = () => {
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [errors, setErrors] = useState({});
+  const [pageError, setPageError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-export default Settings = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setErrors({});
+    setPageError("");
+
+    changePassword({
+      password: password,
+      password_confirmation: passwordConfirmation
+    }).then(() => {
+      destroySession();
+      window.location.replace(`${window.location.pathname}${window.location.search}#/login`);
+    }).catch((error) => {
+      if (error.response?.status === 422) {
+        setErrors(error.response.data);
+      } else {
+        setPageError(error.response?.data?.message || "Unable to change password.");
+      }
+      setIsLoading(false);
+    });
+  };
+
   return (
     <div className="d-flex flex-column gap-4">
       <PageHeader
@@ -29,30 +47,74 @@ export default Settings = () => {
       />
 
       <div className="row g-3">
-        {settingGroups.map((group) => {
-          return (
-            <div className="col-12 col-lg-6" key={group.title}>
-              <AdminContent
-                title={(
-                  <div className="d-flex align-items-center gap-2">
-                    <FontAwesomeIcon icon={group.icon} />
-                    <span>{group.title}</span>
+        <div className="col-12">
+          <AdminContent
+            title={(
+              <div className="d-flex align-items-center gap-2">
+                <FontAwesomeIcon icon={faKey} />
+                <span>Change Password</span>
+              </div>
+            )}
+          >
+            <form className="row g-3" onSubmit={handleSubmit}>
+              {pageError ? (
+                <div className="col-12">
+                  <div className="alert alert-danger mb-0">
+                    {pageError}
                   </div>
-                )}
-              >
-                <div className="d-flex align-items-start gap-3">
-                  <span className="badge rounded-pill text-bg-secondary p-3">
-                    <FontAwesomeIcon icon={faGears} />
-                  </span>
-                  <p className="mb-0 text-muted">
-                    {group.description}
-                  </p>
                 </div>
-              </AdminContent>
-            </div>
-          );
-        })}
+              ) : null}
+
+              <div className="col-12">
+                <label className="form-label">
+                  <FontAwesomeIcon icon={faLock} className="me-2" />
+                  Password
+                </label>
+                <input
+                  type="password"
+                  className={getInputClassName(errors, "password")}
+                  disabled={isLoading}
+                  value={password}
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                  }}
+                />
+                {renderInputErrors(errors, "password")}
+              </div>
+
+              <div className="col-12">
+                <label className="form-label">
+                  <FontAwesomeIcon icon={faShieldHalved} className="me-2" />
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  className={getInputClassName(errors, "password_confirmation")}
+                  disabled={isLoading}
+                  value={passwordConfirmation}
+                  onChange={(event) => {
+                    setPasswordConfirmation(event.target.value);
+                  }}
+                />
+                {renderInputErrors(errors, "password_confirmation")}
+              </div>
+
+              <div className="col-12 d-flex justify-content-end">
+                <button
+                  className="btn btn-primary d-inline-flex align-items-center gap-2"
+                  disabled={isLoading}
+                  type="submit"
+                >
+                  <FontAwesomeIcon icon={faArrowRightFromBracket} />
+                  <span>{isLoading ? "Saving..." : "Change Password"}</span>
+                </button>
+              </div>
+            </form>
+          </AdminContent>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default Settings;

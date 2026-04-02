@@ -143,7 +143,7 @@ const UsersForm = () => {
               </div>
             ) : null}
 
-            <div className="col-12 col-md-6">
+            <div className="col-12">
               <label className="form-label">First Name</label>
               <input
                 className={getInputClassName(errors, "first_name")}
@@ -156,7 +156,7 @@ const UsersForm = () => {
               {renderInputErrors(errors, "first_name")}
             </div>
 
-            <div className="col-12 col-md-6">
+            <div className="col-12">
               <label className="form-label">Last Name</label>
               <input
                 className={getInputClassName(errors, "last_name")}
@@ -169,7 +169,7 @@ const UsersForm = () => {
               {renderInputErrors(errors, "last_name")}
             </div>
 
-            <div className="col-12 col-md-6">
+            <div className="col-12">
               <label className="form-label">Email</label>
               <input
                 className={getInputClassName(errors, "email")}
@@ -182,7 +182,7 @@ const UsersForm = () => {
               {renderInputErrors(errors, "email")}
             </div>
 
-            <div className="col-12 col-md-6">
+            <div className="col-12">
               <label className="form-label">Role</label>
               <select
                 className={getInputClassName(errors, "role")}
@@ -200,7 +200,7 @@ const UsersForm = () => {
 
             {!isEditing ? (
               <React.Fragment>
-                <div className="col-12 col-md-6">
+                <div className="col-12">
                   <label className="form-label">Password</label>
                   <input
                     type="password"
@@ -214,7 +214,7 @@ const UsersForm = () => {
                   {renderInputErrors(errors, "password")}
                 </div>
 
-                <div className="col-12 col-md-6">
+                <div className="col-12">
                   <label className="form-label">Confirm Password</label>
                   <input
                     type="password"

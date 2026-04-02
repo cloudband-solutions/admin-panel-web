@@ -1,25 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faCheck, faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
 import AdminContent from "../commons/AdminContent";
 import ConfirmationModal from "../commons/ConfirmationModal";
 import Loader from "../commons/Loader";
 import PageHeader from "../commons/PageHeader";
+import { statusToLabel } from "../helpers/AppHelper";
 import { destroySession } from "../services/AuthService";
-import { deleteUser, fetchUser } from "../services/UserService";
-
-const badgeClassNames = {
-  active: "text-bg-success",
-  pending: "text-bg-secondary",
-  inactive: "text-bg-warning",
-  deleted: "text-bg-danger"
-};
+import { activateUser, deleteUser, fetchUser } from "../services/UserService";
 
 const UsersShow = () => {
   const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isActivateModalVisible, setIsActivateModalVisible] = useState(false);
+  const [isActivating, setIsActivating] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
@@ -69,6 +65,34 @@ const UsersShow = () => {
       });
   };
 
+  const handleActivate = () => {
+    setIsActivating(true);
+
+    activateUser(id)
+      .then((response) => {
+        setUser(response.data);
+        setErrorMessage("");
+        setIsActivateModalVisible(false);
+      })
+      .catch((error) => {
+        if (error.response?.status === 403) {
+          destroySession();
+          navigate("/login");
+          return;
+        }
+
+        if (error.response?.status === 422) {
+          setErrorMessage(error.response.data?.status?.join(", ") || "Unable to activate user.");
+        } else {
+          setErrorMessage(error.response?.data?.message || "Unable to activate user.");
+        }
+        setIsActivateModalVisible(false);
+      })
+      .finally(() => {
+        setIsActivating(false);
+      });
+  };
+
   useEffect(() => {
     loadUser();
   }, [id]);
@@ -81,6 +105,22 @@ const UsersShow = () => {
   ];
 
   if (user) {
+    if (user.status === "pending") {
+      headerActions.push(
+        <button
+          className="btn btn-success d-inline-flex align-items-center gap-2"
+          key="activate-user"
+          onClick={() => {
+            setIsActivateModalVisible(true);
+          }}
+          type="button"
+        >
+          <FontAwesomeIcon icon={faCheck} />
+          <span>Activate</span>
+        </button>
+      );
+    }
+
     headerActions.push(
       <Link className="btn btn-primary d-inline-flex align-items-center gap-2" key="edit-user" to={`/users/${id}/edit`}>
         <FontAwesomeIcon icon={faPenToSquare} />
@@ -125,25 +165,25 @@ const UsersShow = () => {
 
             {user ? (
               <div className="row g-3">
-                <div className="col-12 col-md-6">
+                <div className="col-12">
                   <div className="border rounded p-3 h-100 bg-light-subtle">
                     <div className="text-muted small text-uppercase mb-1">Email</div>
                     <div className="fw-semibold">{user.email}</div>
                   </div>
                 </div>
-                <div className="col-12 col-md-6">
+                <div className="col-12">
                   <div className="border rounded p-3 h-100 bg-light-subtle">
                     <div className="text-muted small text-uppercase mb-1">Role</div>
                     <div className="text-capitalize fw-semibold">{user.role}</div>
                   </div>
                 </div>
-                <div className="col-12 col-md-6">
+                <div className="col-12">
                   <div className="border rounded p-3 h-100 bg-light-subtle">
                     <div className="text-muted small text-uppercase mb-1">First Name</div>
                     <div className="fw-semibold">{user.first_name}</div>
                   </div>
                 </div>
-                <div className="col-12 col-md-6">
+                <div className="col-12">
                   <div className="border rounded p-3 h-100 bg-light-subtle">
                     <div className="text-muted small text-uppercase mb-1">Last Name</div>
                     <div className="fw-semibold">{user.last_name}</div>
@@ -152,9 +192,7 @@ const UsersShow = () => {
                 <div className="col-12">
                   <div className="border rounded p-3 h-100 bg-light-subtle">
                     <div className="text-muted small text-uppercase mb-1">Status</div>
-                    <span className={`badge ${badgeClassNames[user.status] || "text-bg-dark"} text-capitalize`}>
-                      {user.status}
-                    </span>
+                    {statusToLabel(user.status)}
                   </div>
                 </div>
               </div>
@@ -162,6 +200,19 @@ const UsersShow = () => {
           </React.Fragment>
         )}
       </AdminContent>
+
+      <ConfirmationModal
+        show={isActivateModalVisible}
+        isLoading={isActivating}
+        header="Activate User"
+        content={`Activate ${user?.full_name || "this user"}?`}
+        onPrimaryClicked={handleActivate}
+        onSecondaryClicked={() => {
+          if (!isActivating) {
+            setIsActivateModalVisible(false);
+          }
+        }}
+      />
 
       <ConfirmationModal
         show={isDeleteModalVisible}

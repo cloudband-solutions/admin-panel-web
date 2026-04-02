@@ -2,6 +2,16 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { buildHeaders } from '../helpers/AppHelper';
 
+export const AUTH_STATE_CHANGE_EVENT = "admin-panel-auth-state-change";
+
+const emitAuthStateChange = () => {
+  window.dispatchEvent(new Event(AUTH_STATE_CHANGE_EVENT));
+}
+
+const clearSession = () => {
+  localStorage.removeItem(TOKEN_BEARER);
+}
+
 export const login = (args) => {
   return axios.post(
     `${API_BASE_URL}/login`,
@@ -15,13 +25,33 @@ export const login = (args) => {
   )
 }
 
+export const changePassword = (args) => {
+  return axios.put(
+    `${API_BASE_URL}/system/change_password`,
+    {
+      password: args.password,
+      password_confirmation: args.password_confirmation
+    },
+    {
+      headers: buildHeaders()
+    }
+  );
+}
+
 export const createSession = (args) => {
   // Store the token
   localStorage.setItem(TOKEN_BEARER, args.token);
+  emitAuthStateChange();
+}
+
+export const createSessionAndRedirect = (args) => {
+  createSession(args);
+  window.location.replace(`${window.location.pathname}${window.location.search}#/dashboard`);
 }
 
 export const destroySession = () => {
-  localStorage.removeItem(TOKEN_BEARER);
+  clearSession();
+  emitAuthStateChange();
 }
 
 export const logoutAndRedirect = () => {
@@ -48,13 +78,13 @@ export const getCurrentUser = () => {
     const currentUser = jwtDecode(token);
 
     if (currentUser.exp && currentUser.exp * 1000 <= Date.now()) {
-      destroySession();
+      clearSession();
       return false;
     }
 
     return currentUser;
   } catch (error) {
-    destroySession();
+    clearSession();
     return false;
   }
 }
