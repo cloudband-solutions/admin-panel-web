@@ -10,19 +10,27 @@ import {
 } from "react-router-dom";
 
 import Dashboard from "./Dashboard";
-import Home from "./Home";
 import Settings from "./Settings";
 import UsersIndex from "./users/Index";
 import UsersShow from "./users/Show";
 import UsersForm from "./users/Form";
+import About from "./public/About";
+import Home from "./public/Home";
+import PublicLayout from "./public/Layout";
 
 const PublicApp = () => {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<Home />}
-      />
+      <Route element={<PublicLayout />}>
+        <Route
+          path="/"
+          element={<Home />}
+        />
+        <Route
+          path="/about"
+          element={<About />}
+        />
+      </Route>
       <Route
         path="/login"
         element={<Login />}
